@@ -3,4 +3,12 @@ scipy
 librosa
 soundfile
 pytest
-matplotlib 
+matplotlib
+pyloudnorm
+pydub
+scikit-learn
+pandas
+seaborn
+tqdm
+torch
+encodec 

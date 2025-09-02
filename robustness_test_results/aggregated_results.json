@@ -1,0 +1,137 @@
+{
+  "bandpass_filter": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "highpass_filter": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "lowpass_filter": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "speed_change": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "resample": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "boost_audio": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "duck_audio": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "echo": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "pink_noise": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "white_noise": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "smooth": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "aac": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "mp3": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "encodec": {
+    "mean_ber": 1.0,
+    "std_ber": 0.0,
+    "median_ber": 1.0,
+    "mean_snr": -Infinity,
+    "std_snr": NaN,
+    "success_rate": 0.0,
+    "num_tests": 2
+  },
+  "clean": {
+    "mean_ber": 0.484375,
+    "std_ber": 0.0,
+    "median_ber": 0.484375,
+    "mean_snr": -1.7886150956641735,
+    "std_snr": 0.6912531593224536,
+    "success_rate": 0.0,
+    "num_tests": 2
+  }
+}

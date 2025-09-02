@@ -1,0 +1,123 @@
+{
+  "parameters": {
+    "alpha": 0.05,
+    "block_size": [
+      8,
+      8
+    ],
+    "key": 42,
+    "num_bits": 16
+  },
+  "watermark_bits": [
+    1,
+    0,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    0,
+    0,
+    1,
+    1,
+    0,
+    1,
+    0
+  ],
+  "extracted_bits": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "clean_ber": 0.5,
+  "clean_snr": -3.0025875279378367,
+  "attack_results": {
+    "bandpass_filter": {
+      "ber": 0.4375,
+      "snr": -1.663915800454824,
+      "success": false
+    },
+    "highpass_filter": {
+      "ber": 0.4375,
+      "snr": -0.3666487947327493,
+      "success": false
+    },
+    "lowpass_filter": {
+      "ber": 0.5,
+      "snr": -1.3007938631934164,
+      "success": false
+    },
+    "speed_change": {
+      "ber": 0.4375,
+      "snr": -2.8884626959729074,
+      "success": false
+    },
+    "resample": {
+      "ber": 0.5,
+      "snr": -3.0022353039417955,
+      "success": false
+    },
+    "boost_audio": {
+      "ber": 0.5,
+      "snr": -20.026259736407216,
+      "success": false
+    },
+    "duck_audio": {
+      "ber": 0.4375,
+      "snr": -0.04322738880558885,
+      "success": false
+    },
+    "echo": {
+      "ber": 0.5,
+      "snr": -3.2817714711951913,
+      "success": false
+    },
+    "pink_noise": {
+      "ber": 0.5,
+      "snr": -3.206921177170047,
+      "success": false
+    },
+    "white_noise": {
+      "ber": 0.5,
+      "snr": -3.057126635379621,
+      "success": false
+    },
+    "smooth": {
+      "ber": 0.5,
+      "snr": -0.1309576719466089,
+      "success": false
+    },
+    "aac": {
+      "ber": 0.5,
+      "snr": -2.9705148389785268,
+      "success": false
+    },
+    "mp3": {
+      "ber": 0.5,
+      "snr": -2.78802194816231,
+      "success": false
+    },
+    "encodec": {
+      "ber": 0.5,
+      "snr": -3.00258752793782,
+      "success": false
+    }
+  },
+  "success_rate": 0.0,
+  "avg_attack_ber": 0.48214285714285715
+}

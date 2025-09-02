@@ -1,0 +1,83 @@
+{
+  "parameters": {
+    "alpha": 0.1,
+    "block_size": [
+      16,
+      16
+    ]
+  },
+  "clean_ber": 0.5,
+  "results": {
+    "bandpass_filter": {
+      "ber": 0.46875,
+      "snr": -2.00082765951963,
+      "success": false
+    },
+    "highpass_filter": {
+      "ber": 0.46875,
+      "snr": -1.1280516661645759,
+      "success": false
+    },
+    "lowpass_filter": {
+      "ber": 0.375,
+      "snr": -1.3276694019212418,
+      "success": false
+    },
+    "speed_change": {
+      "ber": 0.46875,
+      "snr": -3.070859925374378,
+      "success": false
+    },
+    "resample": {
+      "ber": 0.5,
+      "snr": -3.480447909437218,
+      "success": false
+    },
+    "boost_audio": {
+      "ber": 0.53125,
+      "snr": -20.96298204037618,
+      "success": false
+    },
+    "duck_audio": {
+      "ber": 0.46875,
+      "snr": -0.05481224446796838,
+      "success": false
+    },
+    "echo": {
+      "ber": 0.53125,
+      "snr": -3.8674005237475697,
+      "success": false
+    },
+    "pink_noise": {
+      "ber": 0.53125,
+      "snr": -3.688036276545424,
+      "success": false
+    },
+    "white_noise": {
+      "ber": 0.5,
+      "snr": -3.5542901048825644,
+      "success": false
+    },
+    "smooth": {
+      "ber": 0.5,
+      "snr": -0.14778406513828765,
+      "success": false
+    },
+    "aac": {
+      "ber": 0.46875,
+      "snr": -2.914503537220927,
+      "success": false
+    },
+    "mp3": {
+      "ber": 0.5,
+      "snr": -2.843245963846538,
+      "success": false
+    },
+    "encodec": {
+      "ber": 0.5,
+      "snr": -3.504682782045385,
+      "success": false
+    }
+  },
+  "success_rate": 0.0
+}

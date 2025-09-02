@@ -1,1 +1,1 @@
-# src/embed/__init__.py 
+# Embedding module (deprecated) 

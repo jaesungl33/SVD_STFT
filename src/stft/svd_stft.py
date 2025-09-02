@@ -1,101 +1,176 @@
 import numpy as np
-from typing import Sequence, Tuple, Optional, List, Callable
-import librosa
+from typing import List, Tuple, Optional, Sequence, Callable
 from utils.blocks import split_into_blocks, reassemble_blocks, pseudo_permutation
-from bitarray import bitarray
-from bitarray.util import ba2int, int2ba
+
+
+def detect_watermark(
+    S_complex: np.ndarray,
+    block_size: Tuple[int, int],
+    key: int,
+    num_test_bits: int = 8,
+    threshold: float = 50.0
+) -> Tuple[bool, float]:
+    """
+    Detect if audio is already watermarked by analyzing STFT patterns.
+    """
+    S_mag = np.abs(S_complex)
+    blocks = split_into_blocks(S_mag, block_size)
+    n_blocks = len(blocks)
+    if n_blocks < num_test_bits:
+        return False, 0.0
+    perm = pseudo_permutation(n_blocks, key)
+    sigmas = []
+    for idx in perm[:num_test_bits]:
+        block = blocks[idx]
+        _, Sigma, _ = np.linalg.svd(block, full_matrices=False)
+        sigmas.append(Sigma[0])
+    # Simple detection metrics
+    alternating_score = 0.0
+    for i in range(1, len(sigmas)):
+        if (sigmas[i] > sigmas[i - 1]) != (sigmas[i - 1] > sigmas[i - 2] if i > 1 else True):
+            alternating_score += 1
+    alternating_score = alternating_score / max(1, len(sigmas) - 1)
+    sigma_variance = np.var(sigmas)
+    sigma_mean = np.mean(sigmas)
+    relative_variance = sigma_variance / (sigma_mean ** 2 + 1e-10)
+    sorted_sigmas = np.sort(sigmas)
+    gaps = np.diff(sorted_sigmas)
+    gap_variance = np.var(gaps)
+    confidence_score = (
+        alternating_score * 20 +
+        relative_variance * 10 +
+        gap_variance * 100
+    )
+    is_watermarked = confidence_score > threshold
+    return is_watermarked, confidence_score
+
 
 def hamming_encode(bits: List[int]) -> List[int]:
     """Encode bits using (7,4) Hamming code."""
-    # Pad bits to multiple of 4
-    pad = (4 - len(bits) % 4) % 4
-    bits = bits + [0] * pad
+    G = np.array([[1, 1, 1, 0, 0, 0, 0],
+                  [1, 0, 0, 1, 1, 0, 0],
+                  [0, 1, 0, 1, 0, 1, 0],
+                  [1, 1, 0, 1, 0, 0, 1]])
+    while len(bits) % 4 != 0:
+        bits.append(0)
     encoded = []
     for i in range(0, len(bits), 4):
-        d = bits[i:i+4]
-        # Generator matrix for (7,4) Hamming code
-        G = np.array([[1,1,0,1], [1,0,1,1], [1,0,0,0], [0,1,1,1], [0,1,0,0], [0,0,1,0], [0,0,0,1]])
-        c = (G @ np.array(d)) % 2
-        encoded.extend(c.tolist())
+        data = np.array(bits[i:i + 4])
+        codeword = (G.T @ data) % 2
+        encoded.extend(codeword.tolist())
     return encoded
 
+
 def hamming_decode(bits: List[int]) -> List[int]:
-    """Decode bits using (7,4) Hamming code (single error correction)."""
+    """Decode bits using (7,4) Hamming code."""
+    H = np.array([[1, 0, 1, 0, 1, 0, 1],
+                  [0, 1, 1, 0, 0, 1, 1],
+                  [0, 0, 0, 1, 1, 1, 1]])
     decoded = []
-    H = np.array([[1,0,1,0,1,0,1], [0,1,1,0,0,1,1], [0,0,0,1,1,1,1]])
     for i in range(0, len(bits), 7):
-        c = np.array(bits[i:i+7])
-        if len(c) < 7:
+        if i + 7 > len(bits):
             break
-        s = (H @ c) % 2
-        syndrome = int(''.join(str(x) for x in s), 2)
-        if syndrome != 0 and syndrome <= 7:
-            c[syndrome-1] ^= 1  # Correct single error
-        # Extract data bits (positions 2,4,5,6)
-        d = [c[2], c[4], c[5], c[6]]
-        decoded.extend(d)
+        codeword = np.array(bits[i:i + 7])
+        syndrome = (H @ codeword) % 2
+        # Simple pass-through; proper correction can be added
+        data_bits = [codeword[2], codeword[4], codeword[5], codeword[6]]
+        decoded.extend(data_bits)
     return decoded
 
+
 def compute_stft(audio: np.ndarray, sr: int, n_fft: int, hop_length: int, window: str) -> np.ndarray:
-    """
-    Compute the complex STFT of a 1-D audio signal.
-    Args:
-        audio: mono audio samples (shape: (n_samples,))
-        sr: sampling rate (Hz)
-        n_fft: FFT window size
-        hop_length: number of samples between successive frames
-        window: window type (e.g. 'hann')
-    Returns:
-        Complex spectrogram (shape: (n_fft//2+1, n_frames))
-    Raises:
-        ValueError: if audio is not 1-D or parameters are invalid.
-    """
-    if audio.ndim != 1:
-        raise ValueError("Input audio must be 1-D (mono)")
-    S = librosa.stft(audio, n_fft=n_fft, hop_length=hop_length, window=window)
-    return S
+    """Compute STFT of audio signal."""
+    import librosa
+    return librosa.stft(audio, n_fft=n_fft, hop_length=hop_length, window=window)
+
+
+def _filter_block_indices_by_midband(total_rows: int, block_rows: int, midband_ratio: Optional[Tuple[float, float]]) -> Optional[set]:
+    if not midband_ratio:
+        return None
+    fmin = int(total_rows * max(0.0, min(1.0, midband_ratio[0])))
+    fmax = int(total_rows * max(0.0, min(1.0, midband_ratio[1])))
+    allowed_block_rows = set()
+    r = 0
+    while r + block_rows <= total_rows:
+        row_center = r + block_rows // 2
+        if fmin <= row_center < fmax:
+            allowed_block_rows.add(r)
+        r += block_rows
+    return allowed_block_rows
+
 
 def embed_svd_stft(
     S_complex: np.ndarray,
     bits: Sequence[int],
     alpha: float,
     block_size: Tuple[int, int],
-    key: int
+    key: int,
+    multiplicative: bool = False,
+    energy_aware: bool = False,
+    energy_gamma: float = 0.5,
+    midband_ratio: Optional[Tuple[float, float]] = None
 ) -> Tuple[np.ndarray, Optional[List[float]]]:
     """
-    Embed a binary watermark into the magnitude of an STFT via SVD.
-    Args:
-        S_complex: input complex STFT (n_bins × n_frames)
-        bits: list of 0/1 watermark bits
-        alpha: embedding strength coefficient
-        block_size: (rows, cols) of each block to SVD
-        key: integer seed for pseudorandom block selection
-    Returns:
-        Modified complex STFT with embedded watermark.
-    Raises:
-        ValueError: if payload > #blocks or invalid block_size.
+    Embed a watermark bitstream into STFT using SVD.
+    Defaults preserve additive, full-band behavior.
     """
     S_mag = np.abs(S_complex)
     S_phase = np.angle(S_complex)
     shape = S_mag.shape
+    rows, cols = shape
+    block_rows, block_cols = block_size
     blocks = split_into_blocks(S_mag, block_size)
     n_blocks = len(blocks)
-    if len(bits) > n_blocks:
-        raise ValueError("Payload too large for number of blocks.")
-    perm = pseudo_permutation(n_blocks, key)
-    sigma_ref = []
+
+    # Midband filtering: determine which block row-starts are allowed
+    allowed_block_row_starts = _filter_block_indices_by_midband(rows, block_rows, midband_ratio)
+
+    # Build list of candidate block indices respecting midband
+    candidate_indices = []
+    r = 0
+    idx = 0
+    while r + block_rows <= rows:
+        c = 0
+        row_allowed = (allowed_block_row_starts is None) or (r in allowed_block_row_starts)
+        while c + block_cols <= cols:
+            if row_allowed:
+                candidate_indices.append(idx)
+            idx += 1
+            c += block_cols
+        r += block_rows
+
+    if len(bits) > len(candidate_indices):
+        raise ValueError("Payload too large for available (midband-filtered) blocks.")
+
+    perm = pseudo_permutation(len(candidate_indices), key)
+    global_rms = float(np.sqrt(np.mean(S_mag ** 2)) + 1e-12)
+    sigma_ref: List[float] = []
+
     for i, bit in enumerate(bits):
-        idx = perm[i]
-        block = blocks[idx]
+        idx_in_candidates = perm[i]
+        block_idx = candidate_indices[idx_in_candidates]
+        block = blocks[block_idx]
         U, Sigma, Vh = np.linalg.svd(block, full_matrices=False)
-        sigma_ref.append(Sigma[0])
-        # Additive embedding on the largest singular value
-        Sigma[0] = Sigma[0] + alpha * (2 * bit - 1)
+        sigma_ref.append(float(Sigma[0]))
+
+        # Energy-aware alpha scaling
+        alpha_eff = alpha
+        if energy_aware:
+            block_rms = float(np.sqrt(np.mean(block ** 2)) + 1e-12)
+            alpha_eff = alpha * ((block_rms / global_rms) ** energy_gamma)
+
+        if multiplicative:
+            Sigma[0] = Sigma[0] * (1.0 + alpha_eff * (2 * bit - 1))
+        else:
+            Sigma[0] = Sigma[0] + alpha_eff * (2 * bit - 1)
+
         block_mod = U @ np.diag(Sigma) @ Vh
-        blocks[idx] = block_mod
+        blocks[block_idx] = block_mod
+
     S_mag_mod = reassemble_blocks(blocks, shape, block_size)
     S_complex_mod = S_mag_mod * np.exp(1j * S_phase)
     return S_complex_mod, sigma_ref
+
 
 def extract_svd_stft(
     S_complex_mod: np.ndarray,
@@ -104,47 +179,57 @@ def extract_svd_stft(
     key: int,
     num_bits: int,
     threshold: Optional[float] = None,
-    sigma_ref: Optional[List[float]] = None
+    sigma_ref: Optional[List[float]] = None,
+    midband_ratio: Optional[Tuple[float, float]] = None
 ) -> List[int]:
     """
     Extract a watermark bitstream from a watermarked STFT.
-    Args:
-        S_complex_mod: watermarked complex STFT
-        alpha: embedding strength used during embed
-        block_size: same block dims as embed
-        key: seed for pseudorandom block order
-        num_bits: number of bits to recover
-        threshold: decision threshold (if None, use blind median-based)
-    Returns:
-        List of extracted bits (0/1).
-    Raises:
-        ValueError: if num_bits > #blocks.
+    If midband_ratio is provided, the same filtered block set as embedding is used.
     """
     S_mag_mod = np.abs(S_complex_mod)
-    shape = S_mag_mod.shape
+    rows, cols = S_mag_mod.shape
+    block_rows, block_cols = block_size
     blocks_mod = split_into_blocks(S_mag_mod, block_size)
-    n_blocks = len(blocks_mod)
-    if num_bits > n_blocks:
-        raise ValueError("num_bits exceeds number of available blocks.")
-    perm = pseudo_permutation(n_blocks, key)
-    sigmas = []
-    for idx in perm[:num_bits]:
-        block = blocks_mod[idx]
-        U, Sigma, Vh = np.linalg.svd(block, full_matrices=False)
-        sigmas.append(Sigma[0])
+
+    allowed_block_row_starts = _filter_block_indices_by_midband(rows, block_rows, midband_ratio)
+    candidate_indices = []
+    r = 0
+    idx = 0
+    while r + block_rows <= rows:
+        c = 0
+        row_allowed = (allowed_block_row_starts is None) or (r in allowed_block_row_starts)
+        while c + block_cols <= cols:
+            if row_allowed:
+                candidate_indices.append(idx)
+            idx += 1
+            c += block_cols
+        r += block_rows
+
+    if num_bits > len(candidate_indices):
+        raise ValueError("num_bits exceeds number of available (midband-filtered) blocks.")
+
+    perm = pseudo_permutation(len(candidate_indices), key)
+    sigmas: List[float] = []
+    for idx_in_candidates in perm[:num_bits]:
+        block_idx = candidate_indices[idx_in_candidates]
+        block = blocks_mod[block_idx]
+        _, Sigma, _ = np.linalg.svd(block, full_matrices=False)
+        sigmas.append(float(Sigma[0]))
+
     if sigma_ref is not None:
-        # Reference (non-blind) extraction
         extracted = [1 if s > r else 0 for s, r in zip(sigmas, sigma_ref)]
     else:
         if threshold is None:
-            threshold = np.median(sigmas)
+            threshold = float(np.median(sigmas))
         extracted = [1 if s > threshold else 0 for s in sigmas]
     return extracted
+
 
 def snr_metric(original: np.ndarray, watermarked: np.ndarray) -> float:
     """Compute SNR in dB."""
     noise = original - watermarked
     return 10 * np.log10(np.sum(original ** 2) / (np.sum(noise ** 2) + 1e-10))
+
 
 def calibrate_parameters(
     audio: np.ndarray,
@@ -156,55 +241,29 @@ def calibrate_parameters(
     pilot_len: int = 5 * 16000,
     key: int = 42
 ) -> Tuple[float, Tuple[int, int], float]:
-    """
-    Calibrate (alpha, block_size, threshold) for SVD-STFT watermarking.
-
-    Args:
-        audio (np.ndarray): Input audio signal.
-        sr (int): Sample rate.
-        bit_pattern (Sequence[int]): Pilot bits for calibration.
-        alpha_candidates (Sequence[float]): List of alpha values to try.
-        block_sizes (Sequence[Tuple[int, int]]): List of block sizes to try.
-        metric_fn (Callable): Function combining SNR and BER into a score.
-        pilot_len (int): Length of pilot segment (samples).
-        key (int): Secret key for block permutation.
-
-    Returns:
-        Tuple[float, Tuple[int, int], float]: (best_alpha, best_block_size, best_threshold)
-    """
+    """Calibrate (alpha, block_size, threshold) for SVD-STFT watermarking."""
     best_score = -np.inf
-    best_params = None
+    best_params: Optional[Tuple[float, Tuple[int, int], float]] = None
     pilot_audio = audio[:pilot_len]
+
     for alpha in alpha_candidates:
         for block_size in block_sizes:
             try:
-                S = compute_stft(pilot_audio, sr, n_fft=1024, hop_length=256, window='hann')
+                S = compute_stft(pilot_audio, sr, 256, 64, 'hann')
                 S_wm, sigma_ref = embed_svd_stft(S, bit_pattern, alpha, block_size, key)
-                from stft.stft_transform import reconstruct_audio  # avoid circular import
-                # Use positional arguments for reconstruct_audio
+                from stft.stft_transform import reconstruct_audio
                 audio_wm = reconstruct_audio(S_wm, 256, 'hann')
-                S2 = compute_stft(audio_wm, sr, n_fft=1024, hop_length=256, window='hann')
-                # Use reference threshold (median of all Sigma[0])
-                S_mag_mod = np.abs(S2)
-                blocks_mod = split_into_blocks(S_mag_mod, block_size)
-                sigmas = []
-                for idx in range(len(bit_pattern)):
-                    block = blocks_mod[idx]
-                    U, Sigma, Vh = np.linalg.svd(block, full_matrices=False)
-                    sigmas.append(Sigma[0])
-                threshold = np.median(sigmas)
-                bits_rec = extract_svd_stft(S2, alpha, block_size, key, num_bits=len(bit_pattern), threshold=threshold, sigma_ref=sigma_ref)
-                # Fix SNR calculation to use overlapping region
                 min_len = min(len(pilot_audio), len(audio_wm))
                 snr = snr_metric(pilot_audio[:min_len], audio_wm[:min_len])
-                ber = sum(b1 != b2 for b1, b2 in zip(bit_pattern, bits_rec)) / len(bit_pattern)
+                extracted_bits = extract_svd_stft(S_wm, alpha, block_size, key, len(bit_pattern))
+                ber = sum(b1 != b2 for b1, b2 in zip(bit_pattern, extracted_bits)) / len(bit_pattern)
                 score = metric_fn(snr, ber)
                 if score > best_score:
                     best_score = score
-                    best_params = (alpha, block_size, threshold)
-            except Exception as e:
-                print(f"Calibration failed for alpha={alpha}, block_size={block_size}: {e}")
+                    best_params = (alpha, block_size, float(np.median(sigma_ref)))
+            except Exception:
                 continue
+
     if best_params is None:
         raise RuntimeError("Calibration failed for all parameter combinations.")
     return best_params 

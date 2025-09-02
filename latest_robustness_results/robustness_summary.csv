@@ -1,0 +1,16 @@
+attack,mean_ber,std_ber,median_ber,mean_snr,std_snr,success_rate,num_tests
+bandpass_filter,1.0,0.0,1.0,-inf,,0.0,5
+highpass_filter,1.0,0.0,1.0,-inf,,0.0,5
+lowpass_filter,1.0,0.0,1.0,-inf,,0.0,5
+speed_change,1.0,0.0,1.0,-inf,,0.0,5
+resample,1.0,0.0,1.0,-inf,,0.0,5
+boost_audio,1.0,0.0,1.0,-inf,,0.0,5
+duck_audio,1.0,0.0,1.0,-inf,,0.0,5
+echo,1.0,0.0,1.0,-inf,,0.0,5
+pink_noise,1.0,0.0,1.0,-inf,,0.0,5
+white_noise,1.0,0.0,1.0,-inf,,0.0,5
+smooth,1.0,0.0,1.0,-inf,,0.0,5
+aac,1.0,0.0,1.0,-inf,,0.0,5
+mp3,1.0,0.0,1.0,-inf,,0.0,5
+encodec,1.0,0.0,1.0,-inf,,0.0,5
+clean,0.4875,0.06358434359179939,0.5,-1.891870590128999,0.8785550832189416,0.0,5

@@ -1,0 +1,63 @@
+{
+  "results": [
+    {
+      "condition": "Clean",
+      "ber": 1.0,
+      "nc": 0.0,
+      "acc": 0.4999999999975,
+      "tpr": 0.99999999999,
+      "fpr": 0.99999999999
+    },
+    {
+      "condition": "MP3",
+      "ber": 1.0,
+      "nc": 0.0,
+      "acc": 0.4999999999975,
+      "tpr": 0.99999999999,
+      "fpr": 0.99999999999
+    },
+    {
+      "condition": "Resample22k",
+      "ber": 1.0,
+      "nc": 0.0,
+      "acc": 0.4999999999975,
+      "tpr": 0.99999999999,
+      "fpr": 0.99999999999
+    },
+    {
+      "condition": "Resample12k",
+      "ber": 1.0,
+      "nc": 0.0,
+      "acc": 0.4999999999975,
+      "tpr": 0.99999999999,
+      "fpr": 0.99999999999
+    },
+    {
+      "condition": "WhiteNoise20",
+      "ber": 1.0,
+      "nc": 0.0,
+      "acc": 0.4999999999975,
+      "tpr": 0.99999999999,
+      "fpr": 0.99999999999
+    },
+    {
+      "condition": "Speed1.25x",
+      "ber": 1.0,
+      "nc": 0.0,
+      "acc": 0.4999999999975,
+      "tpr": 0.99999999999,
+      "fpr": 0.99999999999
+    }
+  ],
+  "summary": {
+    "num_files": 100,
+    "conditions_tested": [
+      "Clean",
+      "MP3",
+      "Resample22k",
+      "Resample12k",
+      "WhiteNoise20",
+      "Speed1.25x"
+    ]
+  }
+}

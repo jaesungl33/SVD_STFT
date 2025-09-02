@@ -1,0 +1,129 @@
+{
+  "optimal_parameters": {
+    "alpha": 0.15,
+    "block_size": [
+      8,
+      8
+    ],
+    "redundancy": 5,
+    "use_error_correction": true
+  },
+  "clean_results": {
+    "ber": 0.25,
+    "snr": -16.7312370044024,
+    "success": false,
+    "original_bits": [
+      1,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0
+    ],
+    "extracted_bits": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "attack_results": {
+    "bandpass_filter": {
+      "ber": 0.25,
+      "snr": -13.69773682451,
+      "success": false
+    },
+    "highpass_filter": {
+      "ber": 0.25,
+      "snr": -14.242433832264558,
+      "success": false
+    },
+    "lowpass_filter": {
+      "ber": 0.75,
+      "snr": -9.529691509923476,
+      "success": false
+    },
+    "speed_change": {
+      "ber": 0.375,
+      "snr": -13.331040783971396,
+      "success": false
+    },
+    "resample": {
+      "ber": 0.25,
+      "snr": -16.536674659406938,
+      "success": false
+    },
+    "boost_audio": {
+      "ber": 0.25,
+      "snr": -36.63799739223823,
+      "success": false
+    },
+    "duck_audio": {
+      "ber": 0.25,
+      "snr": -1.6500007228061304,
+      "success": false
+    },
+    "echo": {
+      "ber": 0.25,
+      "snr": -17.670784541810004,
+      "success": false
+    },
+    "pink_noise": {
+      "ber": 0.25,
+      "snr": -16.73782729774457,
+      "success": false
+    },
+    "white_noise": {
+      "ber": 0.25,
+      "snr": -16.732612776092537,
+      "success": false
+    },
+    "smooth": {
+      "ber": 0.25,
+      "snr": -6.3877211519127215,
+      "success": false
+    },
+    "aac": {
+      "ber": 0.25,
+      "snr": -2.998489601399859,
+      "success": false
+    },
+    "mp3": {
+      "ber": 0.25,
+      "snr": -2.8568251595124257,
+      "success": false
+    },
+    "encodec": {
+      "ber": 0.25,
+      "snr": -16.7312370044024,
+      "success": false
+    }
+  },
+  "summary": {
+    "attack_success_rate": 0.0,
+    "avg_attack_ber": 0.29464285714285715,
+    "total_attacks": 14
+  }
+}

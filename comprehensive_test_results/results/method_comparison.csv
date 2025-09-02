@@ -1,0 +1,4 @@
+Method,Best_SNR_File,Best_SNR_dB,Best_BER_File,Best_BER,Best_NC_File,Best_NC,Best_PESQ_File,Best_PESQ,Total_Files
+SVD_STFT,mitsuru shimizu - bonus track sample.wav,90.65690994262695,"2 cholitas - Misa en Quechua en Pisac, Perú - 7 7.wav",0.0,"2 cholitas - Misa en Quechua en Pisac, Perú - 7 7.wav",1.0,le Chomage - 1 minute.wav,4.997773640483454,100
+Spread_Spectrum,anna xambó - H2RI.04.wav,57.03947900176939,AlexandreDavidGabriel - amadou.wav,0.0,AlexandreDavidGabriel - amadou.wav,1.0,anna xambó - H2RI.01.wav,4.999444497542836,100
+DCT,epsilon not - just focus.wav,inf,adventureholmes_07_doyle_64kb_part1.wav,0.359375,adventureholmes_07_doyle_64kb_part1.wav,0.29243613895360815,epsilon not - just focus.wav,5.0,100

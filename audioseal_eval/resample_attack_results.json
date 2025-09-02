@@ -1,0 +1,9 @@
+{
+  "attack": "resample_32k_roundtrip",
+  "num_files": 100,
+  "best_accuracy": 0.4999999999975,
+  "best_threshold": 0.0,
+  "true_positive_rate": 0.99999999999,
+  "false_positive_rate": 0.99999999999,
+  "roc_auc": 0.5
+}
